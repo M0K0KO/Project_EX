@@ -13,10 +13,6 @@ public class PlayerPhysics : MonoBehaviour
     [SerializeField] private float groundCheckRadius = 0.1f;
     [SerializeField] private float groundCheckDistance = 0.2f;
 
-    [Header("Velocity Constraints")]
-    public float maxNegativeVerticalVelocity = -20f;
-    public float maxPositiveVerticalVelocity = 30f;
-
     [Header("Slope Constraints")]
     [SerializeField] private float maxSlopeAngle = 60f;
 
@@ -25,6 +21,8 @@ public class PlayerPhysics : MonoBehaviour
     public bool isGrounded { get; private set; }
     public Vector3 groundNormal { get; private set; }
     public float groundAngle { get; private set; }
+    public bool isOnSlope { get; private set; }
+    public bool isOnClimbableSlope { get; private set; }
     public Vector3 relativeInputDirection { get; private set; }
     public Vector3 adjustedForwardDirection { get; private set; }
     public Vector3 adjustedDownwardDirection { get; private set; }
@@ -67,6 +65,9 @@ public class PlayerPhysics : MonoBehaviour
             groundAngle = 0;        
             isGrounded = false;
         }
+
+        isOnSlope = !Mathf.Approximately(groundAngle, 0f);
+        isOnClimbableSlope = isOnSlope && isGrounded;
     }
 
     private void AdjustDirections()

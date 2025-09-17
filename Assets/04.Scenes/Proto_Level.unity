@@ -410,7 +410,7 @@ GameObject:
   - component: {fileID: 63145919}
   m_Layer: 0
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: WalkableGround
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -689,7 +689,7 @@ GameObject:
   - component: {fileID: 341007030}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: WalkableGround
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -1033,7 +1033,7 @@ GameObject:
   - component: {fileID: 1227609974}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: WalkableGround
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -1173,6 +1173,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveInput: {x: 0, y: 0}
   sprintInput: 0
+  lightAttackInput: 0
+  heavyAttackInput: 0
 --- !u!1001 &3342256669965123500
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1224,10 +1226,6 @@ PrefabInstance:
     - target: {fileID: 3930454117711302736, guid: 3b449ab8ee419d1489b05009c43ce9b5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8207825625612330663, guid: 3b449ab8ee419d1489b05009c43ce9b5, type: 3}
-      propertyPath: gravityForce
-      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -4,7 +4,7 @@ using UnityEngine;
 public class PlayerConfig : ScriptableObject
 {
     [Header("Locomotion Configs")] 
-    public float runSpeed = 5f;
-    public float sprintSpeed = 12f;
+    public float runSpeed = 2f;
+    public float sprintSpeed = 6f;
     public float rotateSpeed = 10f;
 }

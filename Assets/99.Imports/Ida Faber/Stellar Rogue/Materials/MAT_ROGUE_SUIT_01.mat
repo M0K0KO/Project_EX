@@ -270,7 +270,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: 1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Emission_Color: {r: 0, g: 1, b: 0.8598573, a: 1}
+    - _Emission_Color: {r: 0, g: 1, b: 0.68523145, a: 0.84313726}
     - _From_MatID_Color_1: {r: 1, g: 1, b: 1, a: 0}
     - _From_MatID_Color_2: {r: 1, g: 1, b: 1, a: 0}
     - _From_MatID_Color_3: {r: 1, g: 1, b: 1, a: 0}

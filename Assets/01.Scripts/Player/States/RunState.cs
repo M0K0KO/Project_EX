@@ -14,6 +14,7 @@ public class RunState : BaseState
         Debug.Log("GroundedState/RunState");
         
         player.animController.PlayAnimation("Player_Run_Loop_F_01");
+        //player.animController.PlayAnimation("Player_Run_Start_F_01");
         
         MotorSettings settings = new MotorSettings
         {

@@ -14,6 +14,7 @@ public class SprintState : BaseState
         Debug.Log("GroundedState/SprintState");
         
         player.animController.PlayAnimation("Player_Sprint_Loop_F_01");
+        //player.animController.PlayAnimation("Player_Sprint_Start_F_01");
         
         MotorSettings settings = new MotorSettings
         {

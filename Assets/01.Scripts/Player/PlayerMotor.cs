@@ -10,7 +10,7 @@ public class PlayerMotor : MonoBehaviour
     [Header("Motor Settings")]
     private float moveSpeed;
     private float rotateSpeed;
-    [SerializeField] private float gravityForce = 10f;
+    [SerializeField] private float gravityForce = 20f;
 
     [Header("Motor Flags")]
     private bool canMove;
@@ -42,14 +42,55 @@ public class PlayerMotor : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (canMove) MovePlayer(player.physics.adjustedForwardDirection);
-        if (canRotate) RotatePlayer(player.physics.relativeInputDirection);
-        if (useGravity) ApplyGravity();
+        if (canRotate) RotatePlayer();
+        
+        Vector3 finalVelocity;
+        if (canMove) finalVelocity = CalculateMovementVelocity();
+        else finalVelocity = CalculateIdleVelocity();
+
+        rb.linearVelocity = finalVelocity;
     }
 
-    private void MovePlayer(Vector3 moveDirection)
+    private Vector3 CalculateMovementVelocity()
     {
-        rb.linearVelocity = moveDirection * moveSpeed;
+        Vector3 calculatedVelocity;
+
+        if (player.physics.isGrounded)
+        {
+            calculatedVelocity = player.physics.adjustedForwardDirection * moveSpeed;
+        }
+        else 
+        {
+            Vector3 horizontalMove = player.physics.relativeInputDirection * moveSpeed;
+            calculatedVelocity = new Vector3(horizontalMove.x, rb.linearVelocity.y, horizontalMove.z);
+
+            if (useGravity)
+            {
+                calculatedVelocity += Vector3.down * (gravityForce * Time.fixedDeltaTime);
+            }
+        }
+
+        return calculatedVelocity;
+    }
+    
+    private Vector3 CalculateIdleVelocity()
+    {
+        Vector3 calculatedVelocity;
+
+        if (player.physics.isGrounded)
+        {
+            calculatedVelocity = Vector3.zero;
+        }
+        else 
+        {
+            calculatedVelocity = new Vector3(0, rb.linearVelocity.y, 0);
+
+            if (useGravity)
+            {
+                calculatedVelocity += Vector3.down * (gravityForce * Time.fixedDeltaTime);
+            }
+        }
+        return calculatedVelocity;
     }
     
     public void ResetPlayerVelocity(bool onlyHorizontal)
@@ -64,25 +105,24 @@ public class PlayerMotor : MonoBehaviour
         }
     }
 
-    private void RotatePlayer(Vector3 rotateDirection)
+    private void RotatePlayer()
     {
-        if (rotateDirection == Vector3.zero) return;
-        Vector3 horizontalDirection = new Vector3(rotateDirection.x, 0, rotateDirection.z).normalized;
+        if (player.physics.adjustedForwardDirection == Vector3.zero) return;
+        Vector3 horizontalDirection = new Vector3(player.physics.adjustedForwardDirection.x, 0, player.physics.adjustedForwardDirection.z).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(horizontalDirection, Vector3.up);
         Quaternion smoothedRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotateSpeed * Time.fixedDeltaTime);
         transform.rotation = smoothedRotation;
     }
 
-    private void ApplyGravity()
+    private Vector3 Gravity(bool useAdjustedDirection)
     {
-        if (!player.physics.isGrounded)
+        if (useAdjustedDirection)
         {
-            rb.linearVelocity += player.physics.adjustedDownwardDirection * gravityForce;
-            Mathf.Clamp(rb.linearVelocity.y, -player.physics.maxNegativeVerticalVelocity, player.physics.maxPositiveVerticalVelocity);
+            return player.physics.adjustedForwardDirection * moveSpeed;
         }
         else
         {
-            rb.AddForce(player.physics.adjustedDownwardDirection * 2f, ForceMode.Acceleration);
+            return Vector3.down * gravityForce * Time.fixedDeltaTime;
         }
     }
 }

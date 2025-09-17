@@ -3,22 +3,18 @@ using UnityEngine;
 
 public class PlayerAnimatorController : MonoBehaviour
 {
-    [Header("Components")]
-    private Animator animator;
+    [Header("Components")] private Animator animator;
     private PlayerManager player;
 
-    [Header("Root Motion Settings")] 
-    public bool useRootMotion = true;
+    [Header("Root Motion Settings")] public bool useRootMotion = true;
 
-    [Header("Player State")] 
-    public bool isStrafing = false;
 
     private void Awake()
     {
         player = GetComponent<PlayerManager>();
         animator = player.animator;
     }
-    
+
     private void OnAnimatorMove()
     {
         if (!useRootMotion) return;

@@ -7,6 +7,7 @@ public class PlayerManager : MonoBehaviour
     public PlayerAnimatorController animController { get; private set; }
     public PlayerPhysics physics { get; private set; }
     public PlayerMotor motor { get; private set; }
+    public PlayerStateMachine stateMachine { get; private set; }
     public Animator animator { get; private set; }
     public Rigidbody rb { get; private set; }
 
