@@ -18,6 +18,27 @@ public class PlayerAnimatorController : MonoBehaviour
     private void OnAnimatorMove()
     {
         if (!useRootMotion) return;
+
+        Vector3 newPosition = transform.position + animator.deltaPosition;
+        player.rb.MovePosition(newPosition);
+    }
+
+    private void Update()
+    {
+        UpdateMoveInputParam();
+        UpdateSprintInputParam();
+    }
+
+    private void UpdateMoveInputParam()
+    {
+        bool moveInput = PlayerInputManager.instance.moveInput != Vector2.zero;
+        animator.SetBool("MoveInput", moveInput);
+    }
+
+    private void UpdateSprintInputParam()
+    {
+        bool sprintInput = PlayerInputManager.instance.sprintInput;
+        animator.SetBool("SprintInput", sprintInput);
     }
 
     private void SmoothSetFloat(string parameterName, float targetValue)
@@ -30,5 +51,21 @@ public class PlayerAnimatorController : MonoBehaviour
     public void PlayAnimation(string animationName, float duration = 0.2f)
     {
         animator.CrossFadeInFixedTime(animationName, duration);
+    }
+    
+    public string GetJumpAnimation()
+    {
+        string animationToPlay;
+        
+        if (PlayerInputManager.instance.moveInput != Vector2.zero)
+        {
+            animationToPlay = "Player_Jump_Start_F_01";
+        }
+        else
+        {
+            animationToPlay = "Player_Jump_Start_01";
+        }
+
+        return animationToPlay;
     }
 }

@@ -8,13 +8,22 @@ public class PlayerPhysics : MonoBehaviour
     private PlayerManager player;
 
     [Header("Ground Detection")]
+    public bool checkGround = true;
     [SerializeField] private Transform groundCheckOrigin;
     [SerializeField] private LayerMask groundMask = -1;
     [SerializeField] private float groundCheckRadius = 0.1f;
     [SerializeField] private float groundCheckDistance = 0.2f;
 
+    [Header("Jump Settings")] 
+    private bool isJumping = false;
+    private float jumpStartTime;
+    private float jumpIgnoreGroundTime = 0.3f;
+
     [Header("Slope Constraints")]
     [SerializeField] private float maxSlopeAngle = 60f;
+    
+    [Header("Physics Settings")]
+    public float gravityForce = 20f;
 
     
     public RaycastHit groundHit;
@@ -44,12 +53,23 @@ public class PlayerPhysics : MonoBehaviour
 
     private void FixedUpdate()
     {
-        GroundCheck();
-        AdjustDirections();
+        if (checkGround)
+        {
+            GroundCheck();
+            AdjustDirections();   
+        }
     }
 
     private void GroundCheck()
     {
+        if (isJumping && Time.time - jumpStartTime < jumpIgnoreGroundTime)
+        {
+            isGrounded = false;
+            groundNormal = Vector3.up;
+            groundAngle = 0f;
+            return;
+        }
+        
         Ray ray = new Ray(groundCheckOrigin.position, Vector3.down);
         
         if (Physics.SphereCast(ray, groundCheckRadius, out groundHit, groundCheckDistance, groundMask))
@@ -87,6 +107,13 @@ public class PlayerPhysics : MonoBehaviour
             adjustedForwardDirection = relativeInputDirection;
             adjustedDownwardDirection = Vector3.down;
         }
+    }
+    
+    public void StartJump()
+    {
+        isJumping = true;
+        jumpStartTime = Time.time;
+        isGrounded = false;
     }
     
 

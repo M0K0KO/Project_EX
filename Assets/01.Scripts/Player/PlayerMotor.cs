@@ -10,7 +10,6 @@ public class PlayerMotor : MonoBehaviour
     [Header("Motor Settings")]
     private float moveSpeed;
     private float rotateSpeed;
-    [SerializeField] private float gravityForce = 20f;
 
     [Header("Motor Flags")]
     private bool canMove;
@@ -18,6 +17,10 @@ public class PlayerMotor : MonoBehaviour
     private bool canDash;
     private bool canRotate;
     private bool useGravity;
+
+    public bool executeJump;
+    
+    private Vector3 finalVelocity;
 
     private void Awake()
     {
@@ -42,11 +45,17 @@ public class PlayerMotor : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!player.physics.isGrounded)
+        {
+            Debug.Log("Airborne Input: " + player.physics.relativeInputDirection);
+        }
+        
         if (canRotate) RotatePlayer();
         
-        Vector3 finalVelocity;
         if (canMove) finalVelocity = CalculateMovementVelocity();
         else finalVelocity = CalculateIdleVelocity();
+        
+        if (executeJump) ExecuteJump();
 
         rb.linearVelocity = finalVelocity;
     }
@@ -66,7 +75,7 @@ public class PlayerMotor : MonoBehaviour
 
             if (useGravity)
             {
-                calculatedVelocity += Vector3.down * (gravityForce * Time.fixedDeltaTime);
+                calculatedVelocity += Vector3.down * (player.physics.gravityForce * Time.fixedDeltaTime);
             }
         }
 
@@ -87,7 +96,7 @@ public class PlayerMotor : MonoBehaviour
 
             if (useGravity)
             {
-                calculatedVelocity += Vector3.down * (gravityForce * Time.fixedDeltaTime);
+                calculatedVelocity += Vector3.down * (player.physics.gravityForce * Time.fixedDeltaTime);
             }
         }
         return calculatedVelocity;
@@ -105,6 +114,11 @@ public class PlayerMotor : MonoBehaviour
         }
     }
 
+    public void ResetVerticalVelocity()
+    {
+        rb.linearVelocity = new (rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+    }
+
     private void RotatePlayer()
     {
         if (player.physics.adjustedForwardDirection == Vector3.zero) return;
@@ -114,16 +128,11 @@ public class PlayerMotor : MonoBehaviour
         transform.rotation = smoothedRotation;
     }
 
-    private Vector3 Gravity(bool useAdjustedDirection)
+    private void ExecuteJump()
     {
-        if (useAdjustedDirection)
-        {
-            return player.physics.adjustedForwardDirection * moveSpeed;
-        }
-        else
-        {
-            return Vector3.down * gravityForce * Time.fixedDeltaTime;
-        }
+        executeJump = false;
+
+        finalVelocity.y = player.config.jumpSpeed;
     }
 }
 
@@ -141,8 +150,8 @@ public struct MotorSettings
     public bool useGravity;
 
     public MotorSettings(
-        float moveSpeed,
-        float rotationSpeed,
+        float moveSpeed = 0.5f,
+        float rotationSpeed = 1f,
         bool canMove = true,
         bool canRotate = true,
         bool canJump = true,

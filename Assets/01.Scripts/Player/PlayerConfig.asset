@@ -15,3 +15,4 @@ MonoBehaviour:
   runSpeed: 2
   sprintSpeed: 6
   rotateSpeed: 10
+  jumpSpeed: 10

@@ -10,10 +10,10 @@ public class StateMachine
         this.player = player;
     }
 
-    public void Initialize(BaseState initialState)
+    public void Initialize(BaseState initialState, object payload = null)
     {
         currentState = initialState;
-        initialState.OnEnter();
+        initialState.OnEnter(payload);
     }
 
     public void Update()
@@ -26,11 +26,11 @@ public class StateMachine
         currentState?.OnFixedUpdate();
     }
 
-    public void TransitionTo(BaseState nextState)
+    public void TransitionTo(BaseState nextState, object payload = null)
     {
         currentState?.OnExit();
         
         currentState = nextState;
-        currentState.OnEnter();
+        currentState.OnEnter(payload);
     }
 }

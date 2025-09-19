@@ -8,7 +8,7 @@ public class PlayerStateMachine : MonoBehaviour
     public StateMachine mainStateMachine { get; private set; }
     
     public GroundedState groundedState { get; private set; }
-    //public AirborneState airborneState { get; private set; }
+    public AirborneState airborneState { get; private set; }
 
     private void Awake()
     {
@@ -31,11 +31,12 @@ public class PlayerStateMachine : MonoBehaviour
     private void FixedUpdate()  
     {
         mainStateMachine.FixedUpdate();
+
     }
 
     private void RegisterStates()
     {
         groundedState = new GroundedState(mainStateMachine, this);
-        //airborneState = new AirborneState(mainStateMachine, this);
+        airborneState = new AirborneState(mainStateMachine, this);
     }
 }

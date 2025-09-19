@@ -7,4 +7,7 @@ public class PlayerConfig : ScriptableObject
     public float runSpeed = 2f;
     public float sprintSpeed = 6f;
     public float rotateSpeed = 10f;
+
+    [Header("Jump & Fall Configs")] 
+    public float jumpSpeed = 12f;
 }

@@ -13,15 +13,13 @@ public class PlayerInputManager : MonoBehaviour
     public Vector2 moveInput;
     public bool sprintInput;
 
-    /*
     [Header("Move Action Inputs")]
-    public bool jumpInput;
-    public bool dashInput;
-    */
+    private bool jumpInput;
+    //public bool dashInput;
 
     [Header("Attack Action Inputs")] 
-    public bool lightAttackInput;
-    public bool heavyAttackInput;
+    private bool lightAttackInput;
+    private bool heavyAttackInput;
     
     private void Awake()
     {
@@ -45,6 +43,8 @@ public class PlayerInputManager : MonoBehaviour
         playerInput.Locomotion.Sprint.performed += HandleSprintPerformedInput;
         playerInput.Locomotion.Sprint.canceled += HandleSprintCanceledInput;
 
+        playerInput.Action.Jump.performed += ctx => jumpInput = true;
+        
         playerInput.Attack.LightAttack.performed += ctx => lightAttackInput = true;
         playerInput.Attack.HeavyAttack.performed += ctx => heavyAttackInput = true;
     }
@@ -69,6 +69,13 @@ public class PlayerInputManager : MonoBehaviour
     private void HandleSprintPerformedInput(InputAction.CallbackContext context) => sprintInput = true;
 
     private void HandleSprintCanceledInput(InputAction.CallbackContext context) => sprintInput = false;
+
+    public bool ConsumeJumpInput()
+    {
+        bool value = jumpInput;
+        jumpInput = false;
+        return value;
+    }
 
     private void HandleLightAttackInput()
     {
