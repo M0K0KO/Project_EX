@@ -20,10 +20,11 @@ public class FallState : BaseState
         
         MotorSettings settings = new MotorSettings
         {
+            moveSpeed = player.config.sprintSpeed,
             canMove = true,
             canRotate = false,
             canDash = true,
-            canJump = false, // [TODO] check if player can jump (doubleJump Feature)
+            canJump = true, // [TODO] check if player can jump (doubleJump Feature)
             useGravity = true,
         };
         player.motor.SetMotorSettings(settings);
@@ -31,6 +32,10 @@ public class FallState : BaseState
 
     public override void OnUpdate()
     {
+        if (superState.jumpCount == 1 && player.motor.canJump && PlayerInputManager.instance.ConsumeJumpInput())
+        {
+            stateMachine.TransitionTo(superState.doubleJumpState);
+        }
     }
 
     public override void OnFixedUpdate()

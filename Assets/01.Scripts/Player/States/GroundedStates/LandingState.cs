@@ -7,6 +7,8 @@ public class LandingState : BaseState
     private GroundedState superState;
 
     private IEnumerator waitCoroutine;
+
+    private bool canTransition = false;
     
     public LandingState(StateMachine stateMachine, GroundedState superState) : base(stateMachine)
     {
@@ -18,29 +20,55 @@ public class LandingState : BaseState
         Debug.Log("GroundedState/LandingState");
 
         player.animController.useRootMotion = false;
-        
-        player.animController.PlayAnimation("Player_Jump_End_01");
-        
-        player.motor.ResetPlayerVelocity(false);
-        MotorSettings settings = new MotorSettings
+
+        bool canMove = player.animController.GetLandAnimation(out string animationToPlay);
+        player.animController.PlayAnimation(animationToPlay, 0.05f);
+        if (canMove)
         {
-            moveSpeed = 0f,
-            rotationSpeed = player.config.rotateSpeed,
-            canMove = false,
-            canRotate = true,
-            canDash = true,
-            canJump = true,
-            useGravity = true,
-        };
-        player.motor.SetMotorSettings(settings);
+            stateMachine.TransitionTo(superState.sprintState);
+        }
+        else
+        {
+            player.motor.ResetPlayerVelocity(false);
+            MotorSettings settings = new MotorSettings
+            {
+                moveSpeed = 0f,
+                rotationSpeed = player.config.rotateSpeed,
+                canMove = false,
+                canRotate = true,
+                canDash = true,
+                canJump = false,
+                useGravity = true,
+            };
+            player.motor.SetMotorSettings(settings);
         
-        waitCoroutine = Utility.WaitThenFireAction(0.3f, () => stateMachine.TransitionTo(superState.idleState));
-        superState.playerStateMachine.StartCoroutine(waitCoroutine);
+            waitCoroutine = Utility.WaitThenFireAction(0.3f, () => canTransition = true);
+            superState.playerStateMachine.StartCoroutine(waitCoroutine);
+        }
     }
 
     public override void OnUpdate()
     {
         player.motor.ResetPlayerVelocity(true);
+
+        if (canTransition)
+        {
+            if (PlayerInputManager.instance.moveInput != Vector2.zero)
+            {
+                if (PlayerInputManager.instance.sprintInput)
+                {
+                    stateMachine.TransitionTo(superState.sprintState);
+                }
+                else
+                {
+                    stateMachine.TransitionTo(superState.runState);
+                }
+            }
+            else
+            {
+                stateMachine.TransitionTo(superState.idleState);
+            }
+        }
 
     }
 
@@ -50,7 +78,8 @@ public class LandingState : BaseState
 
     public override void OnExit()
     {
-        superState.playerStateMachine.StopCoroutine(waitCoroutine);
+        if (waitCoroutine != null) superState.playerStateMachine.StopCoroutine(waitCoroutine);
+        canTransition = false;
     }
 
 }

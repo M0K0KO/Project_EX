@@ -9,6 +9,9 @@ public class AirborneState : BaseState
 
     public FallState fallState;
     public JumpState jumpState;
+    public DoubleJumpState doubleJumpState;
+
+    public int jumpCount = 0;
 
     public AirborneState(StateMachine stateMachine, PlayerStateMachine playerStateMachine) : base(stateMachine)
     {
@@ -51,6 +54,7 @@ public class AirborneState : BaseState
         
         if (player.physics.isGrounded)
         {
+            jumpCount = 0;
             stateMachine.TransitionTo(playerStateMachine.groundedState, GroundedEntryType.Landing);
             return;
         }
@@ -75,6 +79,7 @@ public class AirborneState : BaseState
     {
         fallState = new FallState(airborneSubStateMachine, this);
         jumpState = new JumpState(airborneSubStateMachine, this);
+        doubleJumpState = new DoubleJumpState(airborneSubStateMachine, this);
     }
 }
 

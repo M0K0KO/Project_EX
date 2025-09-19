@@ -13,10 +13,14 @@ public class PlayerMotor : MonoBehaviour
 
     [Header("Motor Flags")]
     private bool canMove;
-    private bool canJump;
-    private bool canDash;
+    public bool canJump;
+    public bool canDash;
     private bool canRotate;
     private bool useGravity;
+
+    [Header("States")] 
+    public bool isJumping;
+    public Vector3 storedHorizontalVelocity;
 
     public bool executeJump;
     
@@ -45,22 +49,25 @@ public class PlayerMotor : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!player.physics.isGrounded)
-        {
-            Debug.Log("Airborne Input: " + player.physics.relativeInputDirection);
-        }
-        
         if (canRotate) RotatePlayer();
+
+        if (isJumping)
+        {
+            if (canMove) finalVelocity = CalculateStoredVelocity();
+        }
+        else
+        {
+            if (canMove) finalVelocity = CalculateHorizontalVelocity();
+        }
+
+        if (useGravity) finalVelocity += CalculateGravity();
         
-        if (canMove) finalVelocity = CalculateMovementVelocity();
-        else finalVelocity = CalculateIdleVelocity();
-        
-        if (executeJump) ExecuteJump();
+        if (executeJump) ExecuteJump(); // overwrite y Velocity
 
         rb.linearVelocity = finalVelocity;
     }
 
-    private Vector3 CalculateMovementVelocity()
+    private Vector3 CalculateHorizontalVelocity()
     {
         Vector3 calculatedVelocity;
 
@@ -72,34 +79,33 @@ public class PlayerMotor : MonoBehaviour
         {
             Vector3 horizontalMove = player.physics.relativeInputDirection * moveSpeed;
             calculatedVelocity = new Vector3(horizontalMove.x, rb.linearVelocity.y, horizontalMove.z);
-
-            if (useGravity)
-            {
-                calculatedVelocity += Vector3.down * (player.physics.gravityForce * Time.fixedDeltaTime);
-            }
         }
 
         return calculatedVelocity;
     }
-    
-    private Vector3 CalculateIdleVelocity()
+
+    private Vector3 CalculateStoredVelocity()
     {
         Vector3 calculatedVelocity;
-
-        if (player.physics.isGrounded)
-        {
-            calculatedVelocity = Vector3.zero;
-        }
-        else 
-        {
-            calculatedVelocity = new Vector3(0, rb.linearVelocity.y, 0);
-
-            if (useGravity)
-            {
-                calculatedVelocity += Vector3.down * (player.physics.gravityForce * Time.fixedDeltaTime);
-            }
-        }
+        calculatedVelocity.x = storedHorizontalVelocity.x;
+        calculatedVelocity.z = storedHorizontalVelocity.z;
+        calculatedVelocity.y = rb.linearVelocity.y;
+        
         return calculatedVelocity;
+    }
+
+    private Vector3 CalculateGravity()
+    {
+        return player.physics.adjustedDownwardDirection * (player.physics.gravityForce * Time.fixedDeltaTime);
+    }
+    
+    private void ExecuteJump()
+    {
+        executeJump = false;
+
+        storedHorizontalVelocity = finalVelocity;
+        isJumping = true;
+        finalVelocity.y = player.config.jumpSpeed;
     }
     
     public void ResetPlayerVelocity(bool onlyHorizontal)
@@ -119,20 +125,22 @@ public class PlayerMotor : MonoBehaviour
         rb.linearVelocity = new (rb.linearVelocity.x, 0f, rb.linearVelocity.z);
     }
 
-    private void RotatePlayer()
+    public void RotatePlayer(bool instant = false)
     {
         if (player.physics.adjustedForwardDirection == Vector3.zero) return;
+        
         Vector3 horizontalDirection = new Vector3(player.physics.adjustedForwardDirection.x, 0, player.physics.adjustedForwardDirection.z).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(horizontalDirection, Vector3.up);
-        Quaternion smoothedRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotateSpeed * Time.fixedDeltaTime);
-        transform.rotation = smoothedRotation;
-    }
-
-    private void ExecuteJump()
-    {
-        executeJump = false;
-
-        finalVelocity.y = player.config.jumpSpeed;
+        
+        if (instant)
+        {
+            transform.rotation = targetRotation;
+        }
+        else
+        {
+            Quaternion smoothedRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotateSpeed * Time.fixedDeltaTime);
+            transform.rotation = smoothedRotation;
+        }
     }
 }
 

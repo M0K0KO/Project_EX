@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PlayerConfig
   m_EditorClassIdentifier: 
   runSpeed: 2
-  sprintSpeed: 6
-  rotateSpeed: 10
-  jumpSpeed: 10
+  sprintSpeed: 8
+  rotateSpeed: 20
+  jumpSpeed: 8

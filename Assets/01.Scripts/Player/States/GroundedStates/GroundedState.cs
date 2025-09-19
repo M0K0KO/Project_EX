@@ -50,7 +50,7 @@ public class GroundedState : BaseState
     {
         base.OnUpdate();
 
-        if (PlayerInputManager.instance.ConsumeJumpInput())
+        if (PlayerInputManager.instance.ConsumeJumpInput() && player.motor.canJump)
         {
             stateMachine.TransitionTo(playerStateMachine.airborneState, AirborneEntryType.Jump);
             return;

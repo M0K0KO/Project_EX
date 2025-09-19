@@ -68,4 +68,18 @@ public class PlayerAnimatorController : MonoBehaviour
 
         return animationToPlay;
     }
+
+    public bool GetLandAnimation(out string animationToPlay) // returns should move
+    {
+        if (PlayerInputManager.instance.moveInput != Vector2.zero && PlayerInputManager.instance.sprintInput)
+        {
+            animationToPlay = "Player_Jump_To_Run_F_01";
+            return true;
+        }
+        else
+        {
+            animationToPlay = "Player_Jump_End_01";
+            return false;
+        }
+    }
 }

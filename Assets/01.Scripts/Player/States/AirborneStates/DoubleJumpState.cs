@@ -1,14 +1,11 @@
 using System.Collections;
-using System.Numerics;
 using UnityEngine;
-using Quaternion = UnityEngine.Quaternion;
-using Vector3 = UnityEngine.Vector3;
 
-public class JumpState : BaseState
+public class DoubleJumpState : BaseState
 {
     private AirborneState superState;
-
-    public JumpState(StateMachine stateMachine, AirborneState superState) : base(stateMachine)
+    
+    public DoubleJumpState(StateMachine stateMachine, AirborneState superState) : base(stateMachine)
     {
         this.superState = superState;
     }
@@ -16,18 +13,20 @@ public class JumpState : BaseState
     public override void OnEnter(object payload = null)
     {
         superState.jumpCount++;
-        
-        Debug.Log("AirborneState/JumpState");
+        Debug.Log("AirborneState/DoubleJumpState");
+
         MotorSettings settings = new MotorSettings
         {
             moveSpeed = player.config.sprintSpeed,
+            rotationSpeed = 0f,
             canMove = true,
             canRotate = false,
             canDash = true,
-            canJump = true, // [TODO] check if player can jump (doubleJump Feature)
+            canJump = false, // [TODO] check if player can jump (doubleJump Feature)
             useGravity = true,
         };
         player.motor.SetMotorSettings(settings);
+        player.animController.useRootMotion = false;
         
         Vector3 jumpDirection;
         if (player.physics.adjustedForwardDirection != Vector3.zero)
@@ -48,29 +47,20 @@ public class JumpState : BaseState
             player.transform.rotation = targetRotation;  // 직접 회전 설정
         }
         
-        player.animController.useRootMotion = false;
-
+        player.motor.storedHorizontalVelocity = player.physics.adjustedForwardDirection * player.config.sprintSpeed;
+        
         player.physics.StartJump();
-        
-        player.animController.PlayAnimation(player.animController.GetJumpAnimation());
-        
+        player.animController.PlayAnimation("Player_Double_Jump_01");
         player.motor.executeJump = true;
     }
 
     public override void OnUpdate()
     {
-        if (superState.jumpCount == 1 && player.motor.canJump && PlayerInputManager.instance.ConsumeJumpInput())
-        {
-            stateMachine.TransitionTo(superState.doubleJumpState);
-        }
     }
 
     public override void OnFixedUpdate()
     {
-        if (player.rb.linearVelocity.y < -5f)
-        {
-            stateMachine.TransitionTo(superState.fallState);
-        }
+
     }
 
     public override void OnExit()
